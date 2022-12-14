@@ -93,6 +93,8 @@ const App = () => {
     </AppContext.Provider>
   );
 };`
+
+
 Obviamente, esto se debe a que el useContext  no tiene acceso a los valores proporcionados por el componente del proveedor. Si necesita acceder a él, debe estar al menos un nivel por debajo del componente del proveedor.
 Pero eso no es para preocuparse porque difícilmente tendría la necesidad de acceder a ella de inmediato, ya que su aplicación siempre estará dividida en componentes (me refiero a que está llena de componentes).
 
@@ -101,7 +103,33 @@ React proporciona un hook useReducer que lo ayuda a realizar un seguimiento de m
 
 Debido a que necesitaremos realizar una serie de actualizaciones en nuestro contexto usando estados (como hicimos en el ejemplo anterior), a menudo es conveniente usar useReducer para manejar todos los estados en él.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+useReducer toma dos argumentos requeridos, el primero es la función reductora y el segundo los estados iniciales del hook. Entonces, cada estado que requiera en su contexto (debería) estar incluido en los estados iniciales. Luego, la función devuelve una matriz que contiene el estado actual y una función para manejar los estados (al igual que useState).
+
+
+
+`const reducer = (state, action) => {
+  if (action.type === 'TOGGLE_THEME') {
+    return { ...state, isDarkTheme: !state.isDarkTheme };
+  }
+  return state;
+};`
+
+`const App = () => {
+  const [state, dispatch] = useReducer(reducer, {
+    isDarkTheme: false,
+  });
+  const toggleTheme = () => {
+    dispatch({
+      type: 'TOGGLE_THEME',
+    });
+  };
+  return (
+    <div>
+      <h2>Current theme: {state.isDarkTheme ? 'dark' : 'light'}</h2>
+      <button onClick={toggleTheme}>Toggle theme</button>
+    </div>
+  );
+};`
 
 
 ## Learn More
