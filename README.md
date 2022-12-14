@@ -1,70 +1,123 @@
-# Getting Started with Create React App
+# REACT CONTEXT
+## Creación del context
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React.createContext es una API de contexto de React para crear contextos, es una función que toma un valor predeterminado como único argumento. Este valor podría representar los estados iniciales del context, ya que puede acceder a este valor dondequiera que use el proveedor del context.
 
-## Available Scripts
+`const posts = [];
+const AppContext = React.createContext({ posts });`
 
-In the project directory, you can run:
+La función createContext devuelve un objeto de context que proporciona un componente Provider y otro Consumer.
+El Provider se usa para envolver componentes que usarán nuestro context creado. Cualquier componente que necesite acceso a los valores pasados ​​como valor predeterminado (estado inicial) al createContext, deberá envolverse con el Provider
 
-### `npm start`
+`const App = () => {
+  return (
+    <AppContext.Provider>
+      <Header />               
+      <Main />
+    </AppContext.Provider>
+  );
+};`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The Header and Main components can all access the posts array we set initially while creating the AppContext context. The provider component provides a value prop which overrides the default value in AppContext. When we assign this prop a new value, the Header and Main components will no longer have access to the posts array. But there is a simple approach in which the values provided in the provider component can coexist with the default value of AppContext, and that is with React states.
+### Cómo acceder a los valores de contexto:
+Los componentes que acceden y utilizan los valores de AppContext se denominan consumidores. React proporciona dos métodos para acceder a los valores de contexto
+#### componente Consumer
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+`const Header = () => {
+  return (
+    <AppContext.Consumer>
+      {(value) => {
+        <h2>Posts Length: {value.posts.length} </h2>;
+      }}
+    </AppContext.Consumer>
+  );
+};`
 
-### `npm test`
+Dentro del componente Consumer, creamos una función que tiene un parámetro de valor (proporcionado por React), este valor es el AppContext valor actual (el estado inicial).
+Recuerde que dijimos que el componente Provider también podría proporcionar el valor de context actual y, como tal, anulará el valor predeterminado, así que veamos eso en acción.
+`const posts = [];
+const AppContext = React.createContext({ posts });
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+const App = () => {
+  const updatedPosts = [
+    { id: 1, title: 'a title', body: 'a body' },
+    { id: 2, title: 'a title 2', body: 'a body 2' },
+  ]
 
-### `npm run build`
+  return (
+    <AppContext.Provider value={{posts: updatedPosts}}>
+      <AppContext.Consumer>
+        {({posts}) => {
+          <p>{posts.length}</p> {/* 2 */}
+        }}
+      </AppContext.Consumer>
+    </AppContext.Provider>
+  )
+}`
+Echemos un vistazo al otro método (el más usado) para acceder a un valor de context.
+### HOOK useContext
+Simplemente acepta un objeto de context y devuelve el valor de context actual tal como lo proporciona el valor predeterminado de context o el proveedor de context más cercano.
+`// from
+const Header = () => {
+  return (
+    <AppContext.Consumer>
+      {(value) => {
+        <h2>Posts Length: {value.posts.length} </h2>;
+      }}
+    </AppContext.Consumer>
+  );
+};
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+// to
+const Header = () => {
+  const value = useContext(AppContext);
+  return <h2>Posts Length: {value.posts.length} </h2>;
+};`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Nota: cualquier componente que use el componente del proveedor no puede usar el gancho useContext y esperar el valor proporcionado por el componente del proveedor, es decir:
+`const posts = [];
+const AppContext = React.createContext({
+  posts,
+});
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+const App = () => {
+  const updatedPosts = [
+    { id: 1, title: 'a title', body: 'a body' },
+    { id: 2, title: 'a title 2', body: 'a body 2' },
+  ];
+  const { posts } = useContext(AppContext);
 
-### `npm run eject`
+  return (
+    <AppContext.Provider value={{ posts: updatedPosts }}>
+      <p>{posts.length}</p> {/* 0 */}
+    </AppContext.Provider>
+  );
+};`
+Obviamente, esto se debe a que el useContext  no tiene acceso a los valores proporcionados por el componente del proveedor. Si necesita acceder a él, debe estar al menos un nivel por debajo del componente del proveedor.
+Pero eso no es para preocuparse porque difícilmente tendría la necesidad de acceder a ella de inmediato, ya que su aplicación siempre estará dividida en componentes (me refiero a que está llena de componentes).
+
+### HOOK useReducer
+React proporciona un hook useReducer que lo ayuda a realizar un seguimiento de múltiples estados, es similar al gancho useState y permite una lógica de estado personalizada.
+
+Debido a que necesitaremos realizar una serie de actualizaciones en nuestro contexto usando estados (como hicimos en el ejemplo anterior), a menudo es conveniente usar useReducer para manejar todos los estados en él.
 
 **Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
 ## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
 
 ### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
 
 ### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
 ### Making a Progressive Web App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
 ### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
 ### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
