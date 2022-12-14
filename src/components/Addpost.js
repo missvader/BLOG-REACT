@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { AppContext } from '../context/AppState';
 
 const AddPost = ({ closeModal }) => {
 
   //El formulario Addpost contendrá dos campos de entrada(input), es decir, el título y el cuerpo, y un botón de envío. En el envío, validaríamos la entrada para asegurarnos de que haya valores para el título y el cuerpo
+  const {addPost} = useContext(AppContext);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [error, setError] = useState(false);
@@ -12,7 +14,7 @@ const AddPost = ({ closeModal }) => {
 
     if (!title || !body) return setError('All fields are required');
 
-    console.log({ title, body });
+    addPost({ title, body });
     closeModal();
   };
 
