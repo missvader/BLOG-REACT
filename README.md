@@ -36,14 +36,13 @@ Los componentes que acceden y utilizan los valores de AppContext se denominan co
 Dentro del componente Consumer, creamos una función que tiene un parámetro de valor (proporcionado por React), este valor es el AppContext valor actual (el estado inicial).
 Recuerde que dijimos que el componente Provider también podría proporcionar el valor de context actual y, como tal, anulará el valor predeterminado, así que veamos eso en acción.
 `const posts = [];
-const AppContext = React.createContext({ posts });
+const AppContext = React.createContext({ posts });`
 
-const App = () => {
+`const App = () => {
   const updatedPosts = [
     { id: 1, title: 'a title', body: 'a body' },
     { id: 2, title: 'a title 2', body: 'a body 2' },
   ]
-
   return (
     <AppContext.Provider value={{posts: updatedPosts}}>
       <AppContext.Consumer>
@@ -54,10 +53,12 @@ const App = () => {
     </AppContext.Provider>
   )
 }`
+
 Echemos un vistazo al otro método (el más usado) para acceder a un valor de context.
 ### HOOK useContext
 Simplemente acepta un objeto de context y devuelve el valor de context actual tal como lo proporciona el valor predeterminado de context o el proveedor de context más cercano.
-`// from
+
+`\// from
 const Header = () => {
   return (
     <AppContext.Consumer>
@@ -66,27 +67,26 @@ const Header = () => {
       }}
     </AppContext.Consumer>
   );
-};
-
-// to
+};`
+`\// to
 const Header = () => {
   const value = useContext(AppContext);
   return <h2>Posts Length: {value.posts.length} </h2>;
 };`
 
+
 Nota: cualquier componente que use el componente del proveedor no puede usar el gancho useContext y esperar el valor proporcionado por el componente del proveedor, es decir:
+
 `const posts = [];
 const AppContext = React.createContext({
   posts,
 });
-
 const App = () => {
   const updatedPosts = [
     { id: 1, title: 'a title', body: 'a body' },
     { id: 2, title: 'a title 2', body: 'a body 2' },
   ];
   const { posts } = useContext(AppContext);
-
   return (
     <AppContext.Provider value={{ posts: updatedPosts }}>
       <p>{posts.length}</p> {/* 0 */}
