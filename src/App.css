@@ -96,27 +96,3 @@ footer {
   align-items: center;
   cursor: pointer;
 }
-Ahora cree un archivo App.dark.css y agréguele estos estilos
-header.dark {
-  background-color: #444;
-  color: khaki;
-}
-
-header.dark form {
-  background-color: #444;
-}
-
-main.dark li {
-  border-color: #444;
-  background-color: #444;
-  color: khaki;
-}
-
-main.dark li:hover {
-  border-color: #ccc;
-}
-
-footer.dark {
-  background-color: #444;
-  color: #fff;
-}
