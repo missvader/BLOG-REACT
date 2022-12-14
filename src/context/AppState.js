@@ -1,21 +1,93 @@
 //CREACION DEL CONTEXT 
-/*
-React.createContext es una API de contexto de React para crear contextos, es una función que toma un valor predeterminado como único argumento. Este valor podría representar los estados iniciales del context, ya que puede acceder a este valor dondequiera que use el proveedor del context.
+import { createContext, useReducer } from "react";
 
-const posts = [];
-const AppContext = React.createContext({ posts }); -------> esto es un ejemplo
+const appReducer = (state, action) => {
+  switch (action.type){
+    case 'DELETE_POST': {
+      return {
+        ...state,
+        posts: state.posts.filter((post) => post.id !== action.payload),
+      }
+    }
+    case 'ADD_POST': {
+      return {
+        ...state,
+        posts: [action.payload, ...state.posts],
+      };
+    }
+    case 'SET_DARK_THEME': {
+      return {
+        ...state,
+        darkTheme: action.payload,
+      };
+    }
+    default: {
+      return state;
+    }
+  }
+};
+const initialState = {
+  posts: [
+    {
+      id: 1,
+      title: 'Post One',
+      body: 'This is post one, do to it as you please',
+    },
+    {
+      id: 2,
+      title: 'Post Two',
+      body: 'This is post two, do to it as you please',
+    },
+    {
+      id: 3,
+      title: 'Post Three',
+      body: 'This is post three, do to it as you please',
+    },
+    {
+      id: 4,
+      title: 'Post Four',
+      body: 'This is post four, do to it as you please',
+    },
+  ],
+  darkTheme: false,
+};
+export const AppContext = createContext(initialState);
 
-La función createContext devuelve un objeto de context que proporciona un componente Provider y otro Consumer.
-El Provider se usa para envolver componentes que usarán nuestro context creado. Cualquier componente que necesite acceso a los valores pasados ​​como valor predeterminado (estado inicial) al createContext, deberá envolverse con el Provider 
+export const AppProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(appReducer, initialState);
 
-const App = () => {
+  const deletePost = (id) => {
+    dispatch({
+      type: 'DELETE_POST',
+      payload: id,
+    });
+  };
+
+  const addPost = (post) => {
+    dispatch({
+      type: 'ADD_POST',
+      payload: post,
+    });
+  };
+
+  const setDarkTheme = (bool) => {
+    dispatch({
+      type: 'SET_DARK_THEME',
+      payload: bool,
+    });
+  };
+
   return (
-    <AppContext.Provider>
-      <Header />                --------> ejemplo de uso Provider
-      <Main />
+    <AppContext.Provider
+      value={{
+        posts: state.posts,
+        darkTheme: state.darkTheme,
+        deletePost,
+        addPost,
+        setDarkTheme,
+      }}
+    >
+      {children}
     </AppContext.Provider>
   );
 };
-
-The Header and Main components can all access the posts array we set initially while creating the AppContext context. The provider component provides a value prop which overrides the default value in AppContext. When we assign this prop a new value, the Header and Main components will no longer have access to the posts array. But there is a simple approach in which the values provided in the provider component can coexist with the default value of AppContext, and that is with React states.
-*/
